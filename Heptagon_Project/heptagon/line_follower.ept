@@ -1,0 +1,238 @@
+const kp:int =1
+const ki:int= 0
+const kd:int= 1
+const base_speed:int=43
+(* const base_speed:int=42 --> ispr noice *)
+const max_speed:int=200
+const base_speed_black:int=70
+const max_speed_black:int=170
+const min_speed:int=0
+const junction:int=250  
+const blackcond:int=3800
+const thresholdNode:int=350
+const thresholdNode1:int=600
+(* const adjustVal:int=60 *)
+
+
+node determineDirection(s:int ^5) returns (direction:int);
+    let 
+        direction=  if s[1]>500 or s[0]>500
+            then 2
+         else if s[3]>500 or s[4]>500 
+            then 3  
+        else 1;
+    tel
+
+node specialdetermineDirection(s:int ^5) returns (direction:int);
+    let 
+        direction=  if s[1]>400 or s[0]>400
+            then 2
+         else if s[3]>380 or s[4]>380
+            then 3
+        else 1;
+    tel
+
+node blackleftdetermineDirection(s:int ^5) returns (direction:int);
+    let 
+        direction= if (s[1]<550 or s[0]<550) 
+            then 2
+         else if s[3]<550 or s[4]<550 
+            then 3
+        else 1;
+    tel
+
+node blackrightdetermineDirection(s:int ^5) returns (direction:int);
+    let 
+        direction= if (s[3]<550 or s[4]<550)
+            then 3
+         else if (s[1]<550 or s[0]<550) 
+            then 2
+        else 1;
+    tel
+
+
+node calculatePID(sensor1,sensor2:int) returns (pid:int);
+
+var error,integral, derivative:int;
+let
+    error=sensor1+sensor2;
+    integral=0->pre(integral)+error;
+    derivative=error-(0->pre(error));
+    pid= (kp * error)/12 +( ki * integral) + (kd * derivative)/250;
+tel
+
+node calculatePIDBLack(sensor1,sensor2:int) returns (pid:int);
+
+var error,integral, derivative:int;
+let
+    error=sensor1+sensor2;
+    integral=0->pre(integral)+error;
+    derivative=error-(0->pre(error));
+    pid= (kp * error)/40 +( ki * integral) + (kd * derivative*9)/11;
+   
+tel
+
+node max(a,b:int)returns(max:int)
+
+    let
+        max=if a>=b then a else b
+    tel
+
+node min(a,b:int)returns(min:int)
+
+    let
+        min=if a<=b then a else b
+    tel
+
+
+node blackMain(sen0, sen1, sen2, sen3, sen4,nodeCount: int) returns (v_ll, v_rr: int);
+var sen: int^5;pidLeftTurn,pidRightTurn,leftWheelspeed_left_turn,rightWheelspeed_left_turn,leftWheelspeed_right_turn, rightWheelspeed_right_turn,v_l,v_r,dirr:int;
+let
+    sen = [sen0, sen1, sen2, sen3, sen4];
+
+   
+    (* dirr =if nodeCount<=2 then blackrightdetermineDirection(sen) else blackleftdetermineDirection(sen); *)
+    dirr=blackrightdetermineDirection(sen);
+
+     pidLeftTurn=calculatePIDBLack(802-sen3,853-sen4);
+    pidRightTurn=calculatePIDBLack(762-sen0,833-sen1);
+    (* pidLeftTurn=calculatePIDBLack(800-sen3,((800-sen4)));
+    pidRightTurn=calculatePIDBLack(800-sen0,800-sen1);  *)
+    leftWheelspeed_left_turn=base_speed_black-pidLeftTurn;
+    rightWheelspeed_left_turn=base_speed_black+pidLeftTurn;
+    leftWheelspeed_right_turn=base_speed_black+pidRightTurn;
+    rightWheelspeed_right_turn=base_speed_black-pidRightTurn;
+
+
+
+      v_ll=if v_l>max_speed_black then max_speed_black else if v_l<min_speed then 0 else v_l;
+    v_rr=if v_r>max_speed_black then max_speed_black else if v_r<min_speed then 0 else v_r;
+
+  
+
+     (v_l,v_r)=if dirr=0
+        then
+            (0,0)
+     else if dirr=2
+        then
+           (leftWheelspeed_right_turn,rightWheelspeed_right_turn)
+    else if dirr=3
+        then
+            (leftWheelspeed_left_turn,rightWheelspeed_left_turn)
+    else 
+            (base_speed_black,base_speed_black);            
+
+tel
+
+
+node whitemain(sen0, sen1, sen2, sen3, sen4,cond: int) returns (v_ll, v_rr, dir: int);
+var sen: int^5;pidLeftTurn,pidRightTurn,leftWheelspeed_left_turn,rightWheelspeed_left_turn,leftWheelspeed_right_turn, rightWheelspeed_right_turn,v_l,v_r:int;
+let
+    sen = [sen0, sen1, sen2, sen3, sen4];
+
+    (* dir=if cond<11500 then determineDirection(sen) else if cond<19000 then specialdetermineDirection(sen) else determineDirection(sen); *)
+
+
+     (* dir=if cond<11500 then determineDirection(sen) else if cond<19000 then specialdetermineDirection(sen) else determineDirection(sen);  *)
+    dir=determineDirection(sen);
+    pidLeftTurn=calculatePID(sen3-295,((sen4-321)*5)/2);
+    pidRightTurn=calculatePID(((sen0-302)*5)/2,((sen1-343)));
+    leftWheelspeed_left_turn=base_speed-pidLeftTurn;
+    rightWheelspeed_left_turn=base_speed+pidLeftTurn;
+    leftWheelspeed_right_turn=base_speed+pidRightTurn;
+    rightWheelspeed_right_turn=base_speed-pidRightTurn;
+
+      (* v_ll=if v_l>max_speed then max_speed else if v_l<min_speed then 0 else v_l;
+    v_rr=if v_r>max_speed then max_speed else if v_r<min_speed then 0 else v_r; *)
+
+     v_ll=if v_l>max_speed then v_l else if v_l<min_speed then 0 else v_l;
+    v_rr=if v_r>max_speed then v_r else if v_r<min_speed then 0 else v_r;
+
+
+     (v_l,v_r)=if dir=0
+        then
+            (0,0)
+     else if dir=2
+        then
+           (leftWheelspeed_right_turn,rightWheelspeed_right_turn)
+    else if dir=3
+        then
+            (leftWheelspeed_left_turn,rightWheelspeed_left_turn)
+    else 
+            (base_speed,base_speed);    
+
+tel
+
+
+
+
+node main(sen0, sen1, sen2, sen3, sen4: int) returns (v_l, v_r, dir,nc,inf: int);
+
+    var s: int^5;
+    last whitecond:int;
+    last nodeCount:int;
+    last parkingFlag:int;
+    last insideNodeFlag:int;
+let
+
+    nc=nodeCount;
+    inf=insideNodeFlag;
+    s = [sen0, sen1, sen2, sen3, sen4];
+
+automaton
+state WhiteLine
+do 
+  whitecond= if s[0]>300 and s[1]>300 and s[2]>300 and s[3]>300 and s[4]>300 then
+        0->pre(whitecond)+1 else 0->pre(whitecond);
+        parkingFlag=0;
+        nodeCount=0;
+        insideNodeFlag=0;
+(v_l,v_r,dir)=whitemain(sen0,sen1,sen2,sen3,sen4,whitecond);   
+  (* unless s[0]>550 and s[1]>650 and s[2]>650 and s[3]>650  and s[4]>650 continue BlackLine *)
+unless true continue BlackLine
+end
+
+state BlackLine
+do
+    (* blackcond1= if s[0]>300 and s[1]>300 and s[2]>300 and s[3]>300 and s[4]>300 then
+        0->pre(blackcond1)+1 else 0->pre(blackcond1);
+    parkingFlag=if blackcond1>25000 and s[1]>400 and  s[3]>300  then 1 else 0; *)
+   (* blackcond1=0->pre(blackcond1)+1; *)
+    (* (v_l,v_r)=blackMain(sen0,sen1,sen2,sen3,sen4,blackcond1); *)
+    dir=7;
+
+
+    automaton
+    state OutsideNode  
+do
+(v_l,v_r)=blackMain(sen0,sen1,sen2,sen3,sen4,nodeCount);
+insideNodeFlag=0;
+unless ((s[0]<thresholdNode and s[1]<thresholdNode and s[2]<thresholdNode and s[3]<thresholdNode and s[4]<thresholdNode) or
+    (s[0]<thresholdNode and s[1]<thresholdNode and s[2]<thresholdNode and s[3]<thresholdNode) or (s[0]<thresholdNode and s[1]<thresholdNode and s[2]<thresholdNode) or (s[1]<thresholdNode and s[2]<thresholdNode and s[3]<thresholdNode) or (s[2]<thresholdNode and s[3]<thresholdNode and s[4]<thresholdNode) or
+    (s[1]<thresholdNode and s[2]<thresholdNode and s[3]<thresholdNode and s[4]<thresholdNode)) and (s[0]>100 and s[1]>100 and s[2]>100 and s[3]>100 and s[4]>100)  continue EnteredNode
+
+
+    state EnteredNode
+do
+   nodeCount=0->pre(nodeCount)+1;
+    (v_l,v_r)=blackMain(sen0,sen1,sen2,sen3,sen4,nodeCount);
+    insideNodeFlag=0;
+    until true continue  InsideNode
+
+
+    state InsideNode
+do
+    nodeCount=0->pre(nodeCount);
+     (v_l,v_r)=blackMain(sen0,sen1,sen2,sen3,sen4,nodeCount);
+     insideNodeFlag=1;
+    unless not ((s[0]<thresholdNode1 and s[1]<thresholdNode1 and s[2]<thresholdNode1 and s[3]<thresholdNode1 and s[4]<thresholdNode1) or
+    (s[0]<thresholdNode1 and s[1]<thresholdNode1 and s[2]<thresholdNode1 and s[3]<thresholdNode1) or (s[0]<thresholdNode1 and s[1]<thresholdNode1 and s[2]<thresholdNode1) or (s[1]<thresholdNode1 and s[2]<thresholdNode1 and s[3]<thresholdNode1) or (s[2]<thresholdNode1 and s[3]<thresholdNode1 and s[4]<thresholdNode1) or
+    (s[1]<thresholdNode1 and s[2]<thresholdNode1 and s[3]<thresholdNode1 and s[4]<thresholdNode1)) continue  OutsideNode
+    
+    end
+
+ unless false continue WhiteLine
+
+  
+  end
+tel
