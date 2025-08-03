@@ -2,7 +2,7 @@
 
 An intelligent autonomous robot capable of line following, auto-parking, and wireless ZigBee control with advanced PID controller implementation.
 
-## Features
+## 🤖 Features
 
 - **Line Following**: Precise black line tracking using PID controller
 - **Auto Parking**: Intelligent parking maneuvers with node detection
@@ -10,7 +10,7 @@ An intelligent autonomous robot capable of line following, auto-parking, and wir
 - **Multi-Modal Operation**: Seamless switching between autonomous and manual modes
 - **Finite State Machine**: Robust state management using HEPTAGON framework
 
-## System Architecture
+## 🏗️ System Architecture
 
 The project implements a hybrid control system combining:
 - **PID Controller**: For smooth line following with optimized Kp and Ki parameters
@@ -18,7 +18,7 @@ The project implements a hybrid control system combining:
 - **ZigBee Communication**: Wireless bidirectional communication between robot and controller
 - **Sensor Integration**: IR sensors for line detection and proximity sensors for parking
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 ├── heptagon/
@@ -36,7 +36,7 @@ The project implements a hybrid control system combining:
     └── supervisor.ino        # Main robot supervisor program
 ```
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 - Arduino IDE or compatible embedded development environment
@@ -74,7 +74,7 @@ The project implements a hybrid control system combining:
 - `Ki`: Integral gain (optimized for minimal overshoot)
 - Sensor thresholds calibrated for specific lighting conditions
 
-## Operation Modes
+## 🎮 Operation Modes
 
 ### 1. Line Following Mode
 - Autonomous navigation along black lines
@@ -91,7 +91,7 @@ The project implements a hybrid control system combining:
 - Real-time command transmission
 - Emergency stop functionality
 
-## Hardware Components
+## 🔧 Hardware Components
 
 - **Main Controller**: Arduino-compatible microcontroller
 - **Sensors**: IR line detection sensors, ultrasonic proximity sensors
@@ -100,12 +100,7 @@ The project implements a hybrid control system combining:
 - **Power**: Rechargeable battery system
 - **Chassis**: AlphaBot mechanical platform
 
-## Live Demonstration
-Check out our [Bot in action](https://drive.google.com/file/d/1-1T8hyD8NcCqtepOfr1zIlmGJUTDQUs0/view?usp=sharing) showcasing:
-- Real-time line following with PID control
-- Automatic parking maneuvers
-
-## Team Contributions
+## 👥 Team Contributions
 
 This project was developed through collaborative effort with equal contribution from all team members in:
 - System design and architecture planning
@@ -114,13 +109,31 @@ This project was developed through collaborative effort with equal contribution 
 - Hardware integration and testing
 - Wireless communication setup
 
-## Technical Implementation
+## 🛠️ Technical Implementation
 
 **Control Algorithm**: PID controller with iteratively tuned parameters
 **State Management**: HEPTAGON-based finite state machines
 **Communication Protocol**: ZigBee wireless standard
 **Programming Languages**: C/C++ for embedded systems, HEPTAGON for state machines
 
-## License
+## 📊 Performance
 
-This project is developed as a part of course project  in CS684 (Embedded Systems) under the guidance of [Prof. Kavi Arya](https://www.cse.iitb.ac.in/~kavi/) and [Prof. Paritosh Pandya](https://www.cse.iitb.ac.in/~pandya58/) at IIT Bombay.
+- **Line Following Accuracy**: High precision tracking with minimal deviation
+- **Response Time**: Real-time PID corrections at optimized update rates
+- **Wireless Range**: Effective ZigBee communication within specified range
+- **Battery Life**: Extended operation through efficient power management
+
+## 🔮 Future Enhancements
+
+- Dynamic obstacle avoidance algorithms
+- Machine learning-based path optimization
+- Enhanced sensor fusion for improved accuracy
+- Mobile app integration for advanced control
+
+## 📄 License
+
+This project is developed for educational and research purposes.
+
+## 🤝 Acknowledgments
+
+Special thanks to all team members for their collaborative effort in design, implementation, and extensive testing phases that made this project successful.
