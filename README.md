@@ -1,4 +1,4 @@
-# Alpha Bot - Autonomous Line-Following Robot
+# Automated Line-Following and Parking bot
 
 An intelligent autonomous robot capable of line following, auto-parking, and wireless ZigBee control with advanced PID controller implementation.
 
@@ -121,6 +121,6 @@ This project was developed through collaborative effort with equal contribution 
 **Communication Protocol**: ZigBee wireless standard
 **Programming Languages**: C/C++ for embedded systems, HEPTAGON for state machines
 
-## License
+## Acknowledgements
 
 This project is developed as a part of course project  in CS684 (Embedded Systems) under the guidance of [Prof. Kavi Arya](https://www.cse.iitb.ac.in/~kavi/) and [Prof. Paritosh Pandya](https://www.cse.iitb.ac.in/~pandya58/) at IIT Bombay.
